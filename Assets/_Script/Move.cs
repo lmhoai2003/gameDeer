@@ -1,0 +1,61 @@
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterController))]
+public class Move : MonoBehaviour
+{
+    public float speed = 5f;
+    public float jumpForce = 2f;
+    public float gravity = -9.81f;
+
+    private CharacterController controller;
+    private Vector3 velocity;
+    private bool isGrounded;
+
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+
+        // Mặc định hiện chuột
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    void Update()
+    {
+        // Ẩn chuột khi click chuột trái vào màn hình
+        if (Input.GetMouseButtonDown(0))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        // Kiểm tra đang chạm đất
+        isGrounded = controller.isGrounded;
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+            
+        }
+        Debug.Log("check: "+velocity.y);
+        // Nhập đầu vào
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        // Hướng di chuyển theo camera
+        Vector3 move = transform.right * x + transform.forward * z;
+        move = Camera.main.transform.right * x + Camera.main.transform.forward * z;
+        move.y = 0f; // Không cho nhân vật bay lên
+
+        controller.Move(move.normalized * speed * Time.deltaTime);
+
+        // Nhảy
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+        }
+
+        // Trọng lực
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+}
