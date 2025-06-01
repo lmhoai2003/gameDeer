@@ -20,42 +20,89 @@ public class Move : MonoBehaviour
         Cursor.visible = true;
     }
 
+    // void Update()
+    // {
+    //     // Ẩn chuột khi click chuột trái vào màn hình
+    //     if (Input.GetMouseButtonDown(0))
+    //     {
+    //         Cursor.lockState = CursorLockMode.Locked;
+    //         Cursor.visible = false;
+    //     }
+
+    //     // Kiểm tra đang chạm đất
+    //     isGrounded = controller.isGrounded;
+    //     if (isGrounded && velocity.y < 0)
+    //     {
+    //         velocity.y = -2f;
+
+    //     }
+    //     Debug.Log("check: "+velocity.y);
+    //     // Nhập đầu vào
+    //     float x = Input.GetAxis("Horizontal");
+    //     float z = Input.GetAxis("Vertical");
+
+    //     // Hướng di chuyển theo camera
+    //     Vector3 move = transform.right * x + transform.forward * z;
+    //     move = Camera.main.transform.right * x + Camera.main.transform.forward * z;
+    //     move.y = 0f; // Không cho nhân vật bay lên
+
+    //     controller.Move(move.normalized * speed * Time.deltaTime);
+
+    //     // Nhảy
+    //     if (Input.GetButtonDown("Jump") && isGrounded)
+    //     {
+    //         velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+    //     }
+
+    //     // Trọng lực
+    //     velocity.y += gravity * Time.deltaTime;
+    //     controller.Move(velocity * Time.deltaTime);
+    // }
+    
     void Update()
+{
+    // Ẩn chuột khi click chuột trái vào màn hình
+    if (Input.GetMouseButtonDown(0))
     {
-        // Ẩn chuột khi click chuột trái vào màn hình
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        // Kiểm tra đang chạm đất
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-            
-        }
-        Debug.Log("check: "+velocity.y);
-        // Nhập đầu vào
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        // Hướng di chuyển theo camera
-        Vector3 move = transform.right * x + transform.forward * z;
-        move = Camera.main.transform.right * x + Camera.main.transform.forward * z;
-        move.y = 0f; // Không cho nhân vật bay lên
-
-        controller.Move(move.normalized * speed * Time.deltaTime);
-
-        // Nhảy
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
-        }
-
-        // Trọng lực
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
+
+    // Kiểm tra đang chạm đất
+    isGrounded = controller.isGrounded;
+    if (isGrounded && velocity.y < 0)
+    {
+        velocity.y = -2f;
+    }
+
+    // Nhập đầu vào
+    float x = Input.GetAxis("Horizontal");
+    float z = Input.GetAxis("Vertical");
+
+    // Hướng di chuyển theo camera
+    Vector3 move = Camera.main.transform.right * x + Camera.main.transform.forward * z;
+    move.y = 0f; // Không cho nhân vật bay lên
+
+    // ✅ Xoay nhân vật theo hướng di chuyển
+    if (move.magnitude > 0.1f)
+    {
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            Quaternion.LookRotation(move),
+            Time.deltaTime * 10f
+        );
+    }
+
+    controller.Move(move.normalized * speed * Time.deltaTime);
+
+    // Nhảy
+    if (Input.GetButtonDown("Jump") && isGrounded)
+    {
+        velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+    }
+
+    // Trọng lực
+    velocity.y += gravity * Time.deltaTime;
+    controller.Move(velocity * Time.deltaTime);
+}
 }
